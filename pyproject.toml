@@ -6,5 +6,6 @@ dependencies = [
     "jupyter>=1.1.1",
     "matplotlib>=3.10.8",
     "pandas>=3.0.1",
+    "plotly>=6.5.2",
     "yfinance>=1.2.0",
 ]
