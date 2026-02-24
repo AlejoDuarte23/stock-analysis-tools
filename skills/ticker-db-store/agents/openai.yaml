@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ticker DB Store"
+  short_description: "Fetch ticker data and store/query SQLite"
+  default_prompt: "Store a ticker in SQLite and run quick verification query."
