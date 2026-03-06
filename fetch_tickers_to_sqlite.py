@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch ICOLCAP.CL data from Yahoo Finance and store it in SQLite."""
+"""Fetch ticker data from Yahoo Finance and store it in SQLite for all tickers in ticker_names.json."""
 
 from __future__ import annotations
 
@@ -148,14 +148,39 @@ def fetch_info(ticker: str) -> dict[str, Any]:
     return info
 
 
+def load_tickers(tickers_file: Path) -> list[str]:
+    """Load ticker symbols from a JSON file.
+
+    Supports both a flat array  ["A", "B", ...]
+    and the dict form         {"ticker_names": ["A", "B", ...]}.
+    """
+    with tickers_file.open() as f:
+        data = json.load(f)
+
+    if isinstance(data, list):
+        tickers = data
+    elif isinstance(data, dict) and "ticker_names" in data:
+        tickers = data["ticker_names"]
+    else:
+        raise ValueError(
+            f"Unexpected format in {tickers_file}. "
+            'Expected a JSON array or {{"ticker_names": [...]}}.'
+        )
+
+    if not all(isinstance(t, str) for t in tickers):
+        raise ValueError(f"All ticker entries in {tickers_file} must be strings.")
+
+    return tickers
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Fetch a ticker from Yahoo Finance and store metadata + history in SQLite."
+        description="Fetch tickers sequentially from Yahoo Finance and store metadata + history in SQLite."
     )
     parser.add_argument(
-        "--ticker",
-        default="ICOLCAP.CL",
-        help="Ticker symbol to fetch (default: ICOLCAP.CL)",
+        "--tickers-file",
+        default="ticker_names.json",
+        help="Path to JSON file with list of ticker symbols (default: ticker_names.json)",
     )
     parser.add_argument(
         "--db",
@@ -169,17 +194,39 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    tickers_file = Path(args.tickers_file)
+    if not tickers_file.exists():
+        raise FileNotFoundError(f"Tickers file not found: {tickers_file}")
+
+    tickers = load_tickers(tickers_file)
+    total = len(tickers)
+    print(f"Loaded {total} ticker(s) from {tickers_file}")
+
     db_path = Path(args.db)
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
+    failed: list[str] = []
+
     with sqlite3.connect(db_path) as conn:
         create_tables(conn)
-        info = fetch_info(args.ticker)
-        upsert_ticker_info(conn, args.ticker, info)
-        count = upsert_price_history(conn, args.ticker, period=args.period)
-        conn.commit()
 
-    print(f"Saved ticker info and {count} price rows for {args.ticker} into {db_path}")
+        for i, ticker in enumerate(tickers, start=1):
+            print(f"\n[{i}/{total}] Fetching {ticker}...")
+            try:
+                info = fetch_info(ticker)
+                upsert_ticker_info(conn, ticker, info)
+                count = upsert_price_history(conn, ticker, period=args.period)
+                conn.commit()
+                print(f"  ✓ Saved ticker info and {count} price rows for {ticker}")
+            except Exception as exc:
+                print(f"  ✗ Failed to fetch {ticker}: {exc}")
+                failed.append(ticker)
+
+    print(f"\nDone. Database: {db_path}")
+    if failed:
+        print(f"Failed tickers ({len(failed)}): {failed}")
+    else:
+        print("All tickers fetched successfully.")
 
 
 if __name__ == "__main__":
