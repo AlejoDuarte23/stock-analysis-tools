@@ -7,27 +7,23 @@ description: Store Yahoo Finance ticker metadata and historical prices into a re
 
 ## Overview
 
-Ingest ticker data with `scripts/add_ticker_to_db.py`, then verify load quality with `scripts/check_ticker_in_db.py`. Use upsert semantics so re-running updates existing data instead of duplicating rows.
+Ingest ticker data with:
+- `scripts/fetch_tickers_to_sqlite.py` (yfinance-based batch loader).
+
+Use upsert semantics so re-running updates existing data instead of duplicating rows.
 
 ## Workflow
 
-1. Run ingestion for a ticker:
+1. Run ingestion for tickers from JSON:
 ```bash
-python scripts/add_ticker_to_db.py --ticker ICOLCAP.CL --db stock_data.db --period max
+python scripts/fetch_tickers_to_sqlite.py --tickers-file ticker_names.json --db stock_data.db --period max
 ```
-2. Run a quick SQL check:
-```bash
-python scripts/check_ticker_in_db.py --ticker ICOLCAP.CL --db stock_data.db
-```
-3. Repeat with additional ticker symbols as needed.
+2. Repeat with additional ticker symbols as needed.
 
 ## Scripts
 
-- `scripts/add_ticker_to_db.py`
-Purpose: fetch `Ticker.info` and OHLCV history from Yahoo Finance, then upsert into `ticker_info` and `ticker_prices`.
-
-- `scripts/check_ticker_in_db.py`
-Purpose: run a small SQL summary for one ticker (row count, min/max date, latest close).
+- `scripts/fetch_tickers_to_sqlite.py`
+Purpose: fetch tickers from `ticker_names.json`, then upsert metadata + history into `ticker_info` and `ticker_prices`.
 
 ## Notes
 
