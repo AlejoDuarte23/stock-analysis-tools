@@ -1,0 +1,26 @@
+{
+  "series": {
+    "COLCAP": "ICOLCAP.CL",
+    "SP500": "^GSPC",
+    "BRENT": "BZ=F",
+    "WTI": "CL=F",
+    "VIX": "^VIX",
+    "US10Y": "^TNX",
+    "USDCOP": "COP=X",
+    "EEM": "EEM",
+    "ILF": "ILF",
+    "BRAZIL": "^BVSP",
+    "MEXICO": "^MXX",
+    "CHILE": "^IPSA",
+    "NASDAQ": "^IXIC",
+    "RUSSELL2000": "^RUT",
+    "GOLD": "GC=F",
+    "COPPER": "HG=F",
+    "NATGAS": "NG=F",
+    "DXY": "DX-Y.NYB",
+    "TLT": "TLT",
+    "LQD": "LQD",
+    "HYG": "HYG",
+    "EMB": "EMB"
+  }
+}
