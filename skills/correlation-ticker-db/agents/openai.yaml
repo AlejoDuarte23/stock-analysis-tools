@@ -1,0 +1,4 @@
+interface:
+  display_name: "Correlation Ticker DB"
+  short_description: "Fetch/store COLCAP macro basket into SQLite"
+  default_prompt: "Refresh the correlation ticker basket in covariables_data.db."
