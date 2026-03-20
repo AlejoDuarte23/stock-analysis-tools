@@ -1,0 +1,4 @@
+interface:
+  display_name: "Investing Colombia 10Y"
+  short_description: "Get latest historical row via Playwright"
+  default_prompt: "Fetch the latest historical row for Colombia 10Y from Investing.com."
