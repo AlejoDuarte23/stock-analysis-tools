@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "stock-analysis-tools"
 version = "0.1.0"
@@ -7,8 +11,18 @@ dependencies = [
     "matplotlib>=3.10.8",
     "pandas>=3.0.1",
     "plotly>=6.5.2",
+    "statsmodels>=0.14.6",
     "yfinance>=1.2.0",
 ]
+
+[project.scripts]
+stock-momentum = "cli_tools.momentum:main"
+stock-fundamentals = "cli_tools.fundamentals:main"
+stock-relative-moves = "cli_tools.relative_moves:main"
+stock-pivots = "cli_tools.pivots:main"
+
+[tool.setuptools.packages.find]
+include = ["cli_tools*"]
 
 [dependency-groups]
 dev = [
